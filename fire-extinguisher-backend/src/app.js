@@ -9,6 +9,7 @@ const extinguisherRoutes = require('./modules/extinguisher/extinguisher.routes')
 const inspectionRoutes = require('./modules/inspection/inspection.routes');
 const maintenanceRoutes = require('./modules/maintenance/maintenance.routes');
 const notificationRoutes = require('./modules/notification/notification.routes');
+const reportsRoutes = require('./modules/reports/reports.routes');
 
 require('dotenv').config();
 
@@ -35,6 +36,7 @@ app.use('/api/extinguishers', extinguisherRoutes);
 app.use('/api/inspections', inspectionRoutes);
 app.use('/api/maintenance', maintenanceRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/reports', reportsRoutes);
 
 // 404 Route handler
 app.use((req, res, next) => {
