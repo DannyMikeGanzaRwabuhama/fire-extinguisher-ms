@@ -16,6 +16,26 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: { title: 'TZW Fire Extinguisher API', version: '1.0.0' },
+    components: {
+      securitySchemes: {
+        bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }
+      }
+    },
+    security: [{ bearerAuth: [] }]
+  },
+  apis: ['./src/modules/**/*.routes.js'],
+};
+const specs = swaggerJsDoc(options);
+
+const morgan = require('morgan');
+
 // Security Middlewares
 app.use(helmet());
 app.use(cors({
@@ -23,6 +43,8 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+app.use(morgan(dev))
 
 // Logger
 app.use((req, res, next) => {
