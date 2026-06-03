@@ -44,13 +44,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
-app.use(morgan(dev))
-
-// Logger
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path}`);
-  next();
-});
+app.use(morgan('dev'));
 
 // Routes
 app.use('/api/auth', authRoutes);
