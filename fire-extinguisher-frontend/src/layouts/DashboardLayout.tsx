@@ -13,7 +13,8 @@ import {
   FileText,
   LogOut,
   Menu,
-  User as UserIcon
+  User as UserIcon,
+  Users
 } from 'lucide-react';
 import api from '../api/axios';
 
@@ -46,6 +47,10 @@ export default function DashboardLayout() {
         return 'My Notifications';
       case 'reports':
         return 'System Reports & Analytics';
+      case 'users':
+        return 'Users Management';
+      case 'profile':
+        return 'Profile Settings';
       default:
         return 'Fire Extinguisher Management';
     }
@@ -59,6 +64,8 @@ export default function DashboardLayout() {
     { name: 'Maintenance', path: '/maintenance', icon: Wrench, roles: ['ROLE_ADMIN', 'ROLE_INSPECTOR', 'ROLE_USER'] },
     { name: 'Notifications', path: '/notifications', icon: Bell, roles: ['ROLE_ADMIN', 'ROLE_INSPECTOR', 'ROLE_USER'], badge: true },
     { name: 'Reports', path: '/reports', icon: FileText, roles: ['ROLE_ADMIN'] },
+    { name: 'Users', path: '/users', icon: Users, roles: ['ROLE_ADMIN'] },
+    { name: 'Profile', path: '/profile', icon: UserIcon, roles: ['ROLE_ADMIN', 'ROLE_INSPECTOR', 'ROLE_USER'] },
   ];
 
   const filteredMenuItems = menuItems.filter(item => user && item.roles.includes(user.role));

@@ -36,11 +36,20 @@ const createInspection = async (req, res, next) => {
 
   try {
     // 1. Verify extinguisher exists
-    const extCheck = await db.query('SELECT id FROM extinguishers WHERE id = $1', [extinguisherId]);
+    const extCheck = await db.query('SELECT status, expiry_date FROM extinguishers WHERE id = $1', [extinguisherId]);
     if (extCheck.rows.length === 0) {
       return res.status(404).json({
         status: 404,
         message: 'Extinguisher not found',
+        timestamp: new Date().toISOString(),
+      });
+    }
+    const ext = extCheck.rows[0];
+    const isExpired = ext.status === 'EXPIRED' || new Date(ext.expiry_date) < new Date();
+    if (isExpired || ext.status === 'DECOMMISSIONED') {
+      return res.status(400).json({
+        status: 400,
+        message: 'Bad Request: Cannot schedule inspection on an expired or decommissioned extinguisher.',
         timestamp: new Date().toISOString(),
       });
     }
@@ -84,7 +93,30 @@ const getAllInspections = async (req, res, next) => {
   const offset = (page - 1) * limit;
 
   try {
-    let countQuery = 'SELECT COUNT(*) FROM inspections';
+    const conditions = [];
+    const params = [];
+
+    if (statusFilter) {
+      conditions.push(`i.status = $${params.length + 1}`);
+      params.push(statusFilter);
+    }
+
+    if (req.user.role === 'ROLE_INSPECTOR') {
+      conditions.push(`i.inspector_id = $${params.length + 1}`);
+      params.push(req.user.userId);
+    }
+
+    const whereClause = conditions.length > 0 ? ' WHERE ' + conditions.join(' AND ') : '';
+
+    const countQuery = `
+      SELECT COUNT(*) 
+      FROM inspections i
+      ${whereClause}
+    `;
+
+    const countResult = await db.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].count);
+
     let dataQuery = `
       SELECT i.*, 
              u.first_name AS user_first_name, u.last_name AS user_last_name, u.email AS user_email,
@@ -94,24 +126,13 @@ const getAllInspections = async (req, res, next) => {
       LEFT JOIN users u ON i.user_id = u.id
       LEFT JOIN users ins ON i.inspector_id = ins.id
       LEFT JOIN extinguishers e ON i.extinguisher_id = e.id
+      ${whereClause}
+      ORDER BY i.id DESC
+      LIMIT $${params.length + 1} OFFSET $${params.length + 2}
     `;
-    const params = [];
-    const countParams = [];
 
-    if (statusFilter) {
-      countQuery += ' WHERE status = $1';
-      dataQuery += ' WHERE i.status = $1';
-      params.push(statusFilter);
-      countParams.push(statusFilter);
-    }
-
-    const countResult = await db.query(countQuery, countParams);
-    const total = parseInt(countResult.rows[0].count);
-
-    dataQuery += ` ORDER BY i.id DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
-    params.push(limit, offset);
-
-    const result = await db.query(dataQuery, params);
+    const queryParams = [...params, limit, offset];
+    const result = await db.query(dataQuery, queryParams);
     const totalPages = Math.ceil(total / limit);
 
     res.status(200).json({
@@ -151,6 +172,14 @@ const getInspectionById = async (req, res, next) => {
       });
     }
 
+    if (req.user.role === 'ROLE_INSPECTOR' && result.rows[0].inspector_id !== req.user.userId) {
+      return res.status(403).json({
+        status: 403,
+        message: 'Forbidden: You do not have permission to access this inspection.',
+        timestamp: new Date().toISOString(),
+      });
+    }
+
     res.status(200).json(mapInspection(result.rows[0]));
   } catch (error) {
     next(error);
@@ -162,6 +191,39 @@ const updateInspectionStatus = async (req, res, next) => {
   const { status } = req.body;
 
   try {
+    const inspCheck = await db.query(
+      `SELECT i.*, e.status AS extinguisher_status, e.expiry_date AS extinguisher_expiry_date 
+       FROM inspections i 
+       JOIN extinguishers e ON i.extinguisher_id = e.id 
+       WHERE i.id = $1`,
+      [id]
+    );
+    if (inspCheck.rows.length === 0) {
+      return res.status(404).json({
+        status: 404,
+        message: 'Inspection not found',
+        timestamp: new Date().toISOString(),
+      });
+    }
+    const extStatus = inspCheck.rows[0].extinguisher_status;
+    const extExpiry = inspCheck.rows[0].extinguisher_expiry_date;
+    const isExpired = extStatus === 'EXPIRED' || new Date(extExpiry) < new Date();
+    if (isExpired || extStatus === 'DECOMMISSIONED') {
+      return res.status(400).json({
+        status: 400,
+        message: 'Bad Request: Cannot update inspection status on an expired or decommissioned extinguisher.',
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    if (req.user.role === 'ROLE_INSPECTOR' && inspCheck.rows[0].inspector_id !== req.user.userId) {
+      return res.status(403).json({
+        status: 403,
+        message: 'Forbidden: You cannot update status of an inspection not assigned to you.',
+        timestamp: new Date().toISOString(),
+      });
+    }
+
     const result = await db.query(
       `UPDATE inspections 
        SET status = $1 

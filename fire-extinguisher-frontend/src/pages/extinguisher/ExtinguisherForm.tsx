@@ -58,6 +58,11 @@ export default function ExtinguisherForm({ extinguisher, onSuccess, onClose }: E
       return;
     }
 
+    if (new Date(expiryDate) <= new Date(installationDate)) {
+      toast.error('Expiry date must be after installation date.');
+      return;
+    }
+
     setIsLoading(true);
     try {
       const payload = {

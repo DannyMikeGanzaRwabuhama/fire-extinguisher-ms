@@ -11,6 +11,8 @@ import InspectionList from '../pages/inspection/InspectionList';
 import MaintenanceList from '../pages/maintenance/MaintenanceList';
 import Notifications from '../pages/notifications/Notifications';
 import Reports from '../pages/reports/Reports';
+import UsersList from '../pages/users/UsersList';
+import Profile from '../pages/profile/Profile';
 
 const ProtectedRoute = ({
   children,
@@ -54,11 +56,20 @@ export default function AppRoutes() {
         <Route path="/inspections" element={<InspectionList />} />
         <Route path="/maintenance" element={<MaintenanceList />} />
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/profile" element={<Profile />} />
         <Route
           path="/reports"
           element={
             <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
               <Reports />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
+              <UsersList />
             </ProtectedRoute>
           }
         />

@@ -24,6 +24,14 @@ const createExtinguisher = async (req, res, next) => {
   const initialStatus = status || 'OPERATIONAL';
 
   try {
+    if (new Date(expiryDate) <= new Date(installationDate)) {
+      return res.status(400).json({
+        status: 400,
+        message: 'Bad Request: Expiry date must be after installation date.',
+        timestamp: new Date().toISOString(),
+      });
+    }
+
     const existing = await db.query('SELECT id FROM extinguishers WHERE serial_number = $1', [serialNumber]);
     if (existing.rows.length > 0) {
       return res.status(409).json({
@@ -109,6 +117,16 @@ const updateExtinguisher = async (req, res, next) => {
       return res.status(404).json({
         status: 404,
         message: 'Extinguisher not found',
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    const finalInstDate = fields.installationDate !== undefined ? fields.installationDate : existing.rows[0].installation_date;
+    const finalExpiryDate = fields.expiryDate !== undefined ? fields.expiryDate : existing.rows[0].expiry_date;
+    if (new Date(finalExpiryDate) <= new Date(finalInstDate)) {
+      return res.status(400).json({
+        status: 400,
+        message: 'Bad Request: Expiry date must be after installation date.',
         timestamp: new Date().toISOString(),
       });
     }

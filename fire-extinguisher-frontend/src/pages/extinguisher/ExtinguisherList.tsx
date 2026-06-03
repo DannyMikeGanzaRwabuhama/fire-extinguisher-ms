@@ -297,9 +297,10 @@ export default function ExtinguisherList() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                title="Schedule Inspection"
-                                className="text-muted-foreground hover:text-primary hover:bg-muted"
+                                title={displayStatus === 'EXPIRED' || displayStatus === 'DECOMMISSIONED' ? "Cannot schedule inspection on expired/decommissioned extinguisher" : "Schedule Inspection"}
+                                className="text-muted-foreground hover:text-primary hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
                                 onClick={() => navigate('/inspections', { state: { scheduleFor: item } })}
+                                disabled={displayStatus === 'EXPIRED' || displayStatus === 'DECOMMISSIONED'}
                               >
                                 <CalendarPlus className="h-4 w-4" />
                               </Button>
@@ -308,9 +309,10 @@ export default function ExtinguisherList() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  title="Edit Extinguisher"
-                                  className="text-muted-foreground hover:text-foreground hover:bg-muted"
+                                  title={displayStatus === 'EXPIRED' || displayStatus === 'DECOMMISSIONED' ? "Cannot edit expired/decommissioned extinguisher" : "Edit Extinguisher"}
+                                  className="text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
                                   onClick={() => handleEdit(item)}
+                                  disabled={displayStatus === 'EXPIRED' || displayStatus === 'DECOMMISSIONED'}
                                 >
                                   <Edit className="h-4 w-4" />
                                 </Button>

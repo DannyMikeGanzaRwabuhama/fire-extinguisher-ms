@@ -28,12 +28,47 @@ const createMaintenance = async (req, res, next) => {
   const date = maintenanceDate || new Date().toISOString().split('T')[0];
 
   try {
-    // 1. Verify inspection exists
-    const inspCheck = await db.query('SELECT id FROM inspections WHERE id = $1', [inspectionId]);
+    // 1. Verify inspection exists and fetch details
+    const inspCheck = await db.query(
+      `SELECT i.status AS inspection_status, i.inspector_id, e.status AS extinguisher_status, e.expiry_date 
+       FROM inspections i 
+       JOIN extinguishers e ON i.extinguisher_id = e.id 
+       WHERE i.id = $1`,
+      [inspectionId]
+    );
     if (inspCheck.rows.length === 0) {
       return res.status(404).json({
         status: 404,
         message: 'Inspection not found',
+        timestamp: new Date().toISOString(),
+      });
+    }
+    const insp = inspCheck.rows[0];
+
+    // Check extinguisher status
+    const isExpired = insp.extinguisher_status === 'EXPIRED' || new Date(insp.expiry_date) < new Date();
+    if (isExpired || insp.extinguisher_status === 'DECOMMISSIONED') {
+      return res.status(400).json({
+        status: 400,
+        message: 'Bad Request: Cannot log maintenance on an expired or decommissioned extinguisher.',
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    // Check inspection is completed
+    if (insp.inspection_status !== 'COMPLETED') {
+      return res.status(400).json({
+        status: 400,
+        message: 'Bad Request: Cannot log maintenance on an inspection that is not completed.',
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    // If Inspector role, check inspection is assigned to them
+    if (req.user.role === 'ROLE_INSPECTOR' && insp.inspector_id !== req.user.userId) {
+      return res.status(403).json({
+        status: 403,
+        message: 'Forbidden: You cannot log maintenance for an inspection not assigned to you.',
         timestamp: new Date().toISOString(),
       });
     }
@@ -125,14 +160,41 @@ const updateMaintenance = async (req, res, next) => {
   const fields = req.body;
 
   try {
-    const existing = await db.query('SELECT * FROM maintenance WHERE id = $1', [id]);
-    if (existing.rows.length === 0) {
+    const maintCheck = await db.query(
+      `SELECT m.*, e.status AS extinguisher_status, e.expiry_date AS extinguisher_expiry_date 
+       FROM maintenance m
+       JOIN inspections i ON m.inspection_id = i.id
+       JOIN extinguishers e ON i.extinguisher_id = e.id
+       WHERE m.id = $1`,
+      [id]
+    );
+    if (maintCheck.rows.length === 0) {
       return res.status(404).json({
         status: 404,
         message: 'Maintenance record not found',
         timestamp: new Date().toISOString(),
       });
     }
+    const extStatus = maintCheck.rows[0].extinguisher_status;
+    const extExpiry = maintCheck.rows[0].extinguisher_expiry_date;
+    const isExpired = extStatus === 'EXPIRED' || new Date(extExpiry) < new Date();
+    if (isExpired || extStatus === 'DECOMMISSIONED') {
+      return res.status(400).json({
+        status: 400,
+        message: 'Bad Request: Cannot update maintenance record on an expired or decommissioned extinguisher.',
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    if (req.user.role === 'ROLE_INSPECTOR' && maintCheck.rows[0].inspector_id !== req.user.userId) {
+      return res.status(403).json({
+        status: 403,
+        message: 'Forbidden: You cannot modify maintenance records not logged by you.',
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    const existing = maintCheck.rows[0];
 
     const keyMapping = {
       actions: 'actions',
