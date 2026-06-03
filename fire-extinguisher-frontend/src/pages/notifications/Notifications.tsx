@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { notificationApi } from '../../api/notification';
-import type { Notification } from '../../mock/mockData';
-import { mockNotifications } from '../../mock/mockData';
+import type { Notification } from '../../api/notification';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Check, Bell, BellOff, Calendar } from 'lucide-react';
@@ -9,7 +8,6 @@ import { toast } from 'sonner';
 import PaginationControls from '../../components/PaginationControls';
 
 const ITEMS_PER_PAGE = 10;
-const USE_REAL_API = true;
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -19,15 +17,11 @@ export default function Notifications() {
   const fetchNotifications = async () => {
     setIsLoading(true);
     try {
-      if (USE_REAL_API) {
-        const res = await notificationApi.getAll({ page: 1, limit: 100 });
-        setNotifications(res.data);
-      } else {
-        setNotifications(mockNotifications);
-      }
+      const res = await notificationApi.getAll({ page: 1, limit: 100 });
+      setNotifications(res.data);
     } catch {
-      toast.error('Failed to load notifications. Using mock data.');
-      setNotifications(mockNotifications);
+      toast.error('Failed to load notifications.');
+      setNotifications([]);
     } finally {
       setIsLoading(false);
     }
@@ -39,13 +33,7 @@ export default function Notifications() {
 
   const handleMarkAsRead = async (id: number) => {
     try {
-      if (USE_REAL_API) {
-        await notificationApi.markAsRead(id);
-      } else {
-        setNotifications((prev) =>
-          prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
-        );
-      }
+      await notificationApi.markAsRead(id);
       toast.success('Notification marked as read.');
       fetchNotifications();
     } catch {

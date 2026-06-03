@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { extinguisherApi } from '../../api/extinguisher';
-import type { Extinguisher } from '../../mock/mockData';
-import { mockExtinguishers } from '../../mock/mockData';
+import type { Extinguisher } from '../../api/extinguisher';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,7 +17,6 @@ import ExtinguisherForm from './ExtinguisherForm';
 import { useNavigate } from 'react-router-dom';
 
 const ITEMS_PER_PAGE = 10;
-const USE_REAL_API = true; // Easily toggle back to mock if needed
 
 export default function ExtinguisherList() {
   const { user } = useAuth();
@@ -48,16 +46,12 @@ export default function ExtinguisherList() {
   const fetchExtinguishers = async () => {
     setIsLoading(true);
     try {
-      if (USE_REAL_API) {
-        // Fetch up to 200 extinguishers to allow robust client-side filtering/searching
-        const res = await extinguisherApi.getAll({ page: 1, limit: 200 });
-        setExtinguishers(res.data);
-      } else {
-        setExtinguishers(mockExtinguishers);
-      }
+      // Fetch up to 200 extinguishers to allow robust client-side filtering/searching
+      const res = await extinguisherApi.getAll({ page: 1, limit: 200 });
+      setExtinguishers(res.data || []);
     } catch (err: any) {
-      toast.error('Failed to load extinguishers. Using mock data instead.');
-      setExtinguishers(mockExtinguishers);
+      toast.error('Failed to load extinguishers.');
+      setExtinguishers([]);
     } finally {
       setIsLoading(false);
     }
@@ -124,9 +118,7 @@ export default function ExtinguisherList() {
     if (deleteId === null) return;
     setIsDeleting(true);
     try {
-      if (USE_REAL_API) {
-        await extinguisherApi.delete(deleteId);
-      }
+      await extinguisherApi.delete(deleteId);
       toast.success('Extinguisher deleted successfully.');
       fetchExtinguishers();
     } catch (err: any) {

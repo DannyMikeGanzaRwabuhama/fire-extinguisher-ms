@@ -1,5 +1,12 @@
 import api from './axios';
-import type { Notification } from '../mock/mockData';
+
+export interface Notification {
+  id: number;
+  userId: number;
+  message: string;
+  createdAt: string;
+  isRead: boolean;
+}
 
 export interface NotificationListResponse {
   data: Notification[];

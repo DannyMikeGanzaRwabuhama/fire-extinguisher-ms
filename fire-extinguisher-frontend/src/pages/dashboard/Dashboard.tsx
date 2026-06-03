@@ -1,29 +1,65 @@
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Flame, ShieldCheck, AlertTriangle, Calendar, ClipboardCheck } from 'lucide-react';
 import StatusBadge from '../../components/StatusBadge';
-import { mockExtinguishers, mockInspections } from '../../mock/mockData';
+import { extinguisherApi } from '../../api/extinguisher';
+import { inspectionApi } from '../../api/inspection';
+import type { Extinguisher } from '../../api/extinguisher';
+import type { Inspection } from '../../api/inspection';
+import { toast } from 'sonner';
 
 export default function Dashboard() {
-  const currentDate = new Date('2026-06-03T11:12:13+02:00'); // Use current system date
+  const [extinguishers, setExtinguishers] = useState<Extinguisher[]>([]);
+  const [inspections, setInspections] = useState<Inspection[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Dynamically calculate stats based on mock data and expiry dates
-  const totalExtinguishers = mockExtinguishers.length;
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const [extRes, inspRes] = await Promise.all([
+          extinguisherApi.getAll({ page: 1, limit: 200 }),
+          inspectionApi.getAll({ page: 1, limit: 100 })
+        ]);
+        setExtinguishers(extRes.data || []);
+        setInspections(inspRes.data || []);
+      } catch (err: any) {
+        toast.error('Failed to load dashboard statistics.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <p className="text-sm text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
+  const currentDate = new Date('2026-06-03T11:12:13+02:00'); // Use standard local date
+
+  // Dynamically calculate stats based on API data and expiry dates
+  const totalExtinguishers = extinguishers.length;
   
-  const expiredExtinguishers = mockExtinguishers.filter(
+  const expiredExtinguishers = extinguishers.filter(
     (e) => e.status === 'EXPIRED' || new Date(e.expiryDate) < currentDate
   ).length;
 
-  const operationalExtinguishers = mockExtinguishers.filter(
+  const operationalExtinguishers = extinguishers.filter(
     (e) => e.status === 'OPERATIONAL' && new Date(e.expiryDate) >= currentDate
   ).length;
 
-  const scheduledInspections = mockInspections.filter(
+  const scheduledInspections = inspections.filter(
     (i) => i.status === 'SCHEDULED'
   ).length;
 
   // Get recent 5 inspections
-  const recentInspections = [...mockInspections]
+  const recentInspections = [...inspections]
     .sort((a, b) => new Date(b.inspectionDate).getTime() - new Date(a.inspectionDate).getTime())
     .slice(0, 5);
 
@@ -122,7 +158,7 @@ export default function Dashboard() {
                         {inspection.extinguisher?.location || 'N/A'}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {inspection.inspectionDate}
+                        {inspection.inspectionDate.split('T')[0]}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {inspection.inspectionTime}

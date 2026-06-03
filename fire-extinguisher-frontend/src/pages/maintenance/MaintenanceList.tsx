@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { maintenanceApi } from '../../api/maintenance';
-import type { Maintenance } from '../../mock/mockData';
-import { mockMaintenance } from '../../mock/mockData';
+import type { Maintenance } from '../../api/maintenance';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -14,7 +13,6 @@ import PaginationControls from '../../components/PaginationControls';
 import MaintenanceForm from './MaintenanceForm';
 
 const ITEMS_PER_PAGE = 10;
-const USE_REAL_API = true;
 
 export default function MaintenanceList() {
   const { user } = useAuth();
@@ -37,15 +35,11 @@ export default function MaintenanceList() {
   const fetchMaintenance = async () => {
     setIsLoading(true);
     try {
-      if (USE_REAL_API) {
-        const res = await maintenanceApi.getAll({ page: 1, limit: 100 });
-        setMaintenanceLogs(res.data);
-      } else {
-        setMaintenanceLogs(mockMaintenance);
-      }
+      const res = await maintenanceApi.getAll({ page: 1, limit: 100 });
+      setMaintenanceLogs(res.data || []);
     } catch {
-      toast.error('Failed to load maintenance logs. Using mock data.');
-      setMaintenanceLogs(mockMaintenance);
+      toast.error('Failed to load maintenance logs.');
+      setMaintenanceLogs([]);
     } finally {
       setIsLoading(false);
     }

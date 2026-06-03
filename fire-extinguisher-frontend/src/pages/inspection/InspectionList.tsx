@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { inspectionApi } from '../../api/inspection';
-import type { Inspection } from '../../mock/mockData';
-import { mockInspections } from '../../mock/mockData';
+import type { Inspection } from '../../api/inspection';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -16,7 +15,6 @@ import PaginationControls from '../../components/PaginationControls';
 import InspectionForm from './InspectionForm';
 
 const ITEMS_PER_PAGE = 10;
-const USE_REAL_API = true;
 
 const statusOptions = ['SCHEDULED', 'ONGOING', 'COMPLETED', 'CANCELLED'];
 
@@ -47,17 +45,13 @@ export default function InspectionList() {
   const fetchInspections = async () => {
     setIsLoading(true);
     try {
-      if (USE_REAL_API) {
-        // Fetch inspections
-        const params = statusFilter !== 'ALL' ? { status: statusFilter, limit: 100 } : { limit: 100 };
-        const res = await inspectionApi.getAll(params);
-        setInspections(res.data);
-      } else {
-        setInspections(mockInspections);
-      }
+      // Fetch inspections
+      const params = statusFilter !== 'ALL' ? { status: statusFilter, limit: 100 } : { limit: 100 };
+      const res = await inspectionApi.getAll(params);
+      setInspections(res.data || []);
     } catch {
-      toast.error('Failed to load inspections. Using mock data instead.');
-      setInspections(mockInspections);
+      toast.error('Failed to load inspections.');
+      setInspections([]);
     } finally {
       setIsLoading(false);
     }
@@ -105,14 +99,7 @@ export default function InspectionList() {
     if (!statusEditInspection) return;
     setIsUpdatingStatus(true);
     try {
-      if (USE_REAL_API) {
-        await inspectionApi.updateStatus(statusEditInspection.id, newStatus);
-      } else {
-        // Mock update
-        setInspections((prev) =>
-          prev.map((i) => (i.id === statusEditInspection.id ? { ...i, status: newStatus as any } : i))
-        );
-      }
+      await inspectionApi.updateStatus(statusEditInspection.id, newStatus);
       toast.success('Inspection status updated successfully.');
       fetchInspections();
     } catch {

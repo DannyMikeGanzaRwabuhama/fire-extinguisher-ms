@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { Extinguisher } from '../../mock/mockData';
+import type { Extinguisher } from '../../api/extinguisher';
 import { extinguisherApi } from '../../api/extinguisher';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

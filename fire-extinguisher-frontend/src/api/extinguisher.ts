@@ -1,5 +1,15 @@
 import api from './axios';
-import type { Extinguisher } from '../mock/mockData';
+
+export interface Extinguisher {
+  id: number;
+  serialNumber: string;
+  location: string;
+  type: 'WATER' | 'CO2' | 'FOAM' | 'DRY_CHEMICAL';
+  size: '2.5LBS' | '5LBS' | '9LBS' | '12LBS';
+  installationDate: string;
+  expiryDate: string;
+  status: 'OPERATIONAL' | 'EXPIRED' | 'DECOMMISSIONED';
+}
 
 export interface ExtinguisherListResponse {
   data: Extinguisher[];

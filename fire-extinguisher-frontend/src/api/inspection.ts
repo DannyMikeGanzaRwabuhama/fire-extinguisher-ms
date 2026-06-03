@@ -1,5 +1,35 @@
 import api from './axios';
-import type { Inspection } from '../mock/mockData';
+
+export interface InspectorInfo {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+export interface Inspection {
+  id: number;
+  userId: number;
+  extinguisherId: number;
+  inspectorId: number | null;
+  inspectionDate: string;
+  inspectionTime: string;
+  status: 'SCHEDULED' | 'ONGOING' | 'COMPLETED' | 'CANCELLED';
+  user?: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  inspector?: InspectorInfo;
+  extinguisher?: {
+    id: number;
+    serialNumber: string;
+    location: string;
+    type: string;
+    size: string;
+  };
+}
 
 export interface InspectionListResponse {
   data: Inspection[];

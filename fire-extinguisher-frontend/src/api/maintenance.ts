@@ -1,5 +1,22 @@
 import api from './axios';
-import type { Maintenance } from '../mock/mockData';
+import type { InspectorInfo } from './inspection';
+
+export interface Maintenance {
+  id: number;
+  inspectionId: number;
+  inspectorId: number;
+  actions: string;
+  maintenanceDate: string;
+  conditionsNoted: string;
+  inspector?: InspectorInfo;
+  inspection?: {
+    id: number;
+    inspectionDate: string;
+    status: string;
+    extinguisherId: number;
+    serialNumber: string;
+  };
+}
 
 export interface MaintenanceListResponse {
   data: Maintenance[];
