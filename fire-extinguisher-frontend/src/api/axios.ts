@@ -14,8 +14,12 @@ api.interceptors.response.use(
   res => res,
   err => {
     if (err.response?.status === 401) {
-      localStorage.clear();
-      window.location.href = '/login';
+      const url = err.config?.url || '';
+      // Exclude login and register endpoints so they can handle 401 errors locally in the UI
+      if (!url.endsWith('/auth/login') && !url.endsWith('/auth/register')) {
+        localStorage.clear();
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(err);
   }
