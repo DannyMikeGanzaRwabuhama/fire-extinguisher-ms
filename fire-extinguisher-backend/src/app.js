@@ -5,6 +5,7 @@ const db = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
 
 const authRoutes = require('./modules/auth/auth.routes');
+const extinguisherRoutes = require('./modules/extinguisher/extinguisher.routes');
 
 require('dotenv').config();
 
@@ -27,6 +28,7 @@ app.use((req, res, next) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/extinguishers', extinguisherRoutes);
 
 // 404 Route handler
 app.use((req, res, next) => {
