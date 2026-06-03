@@ -1,5 +1,5 @@
 import api from './axios';
-import { Extinguisher } from '../mock/mockData';
+import type { Extinguisher } from '../mock/mockData';
 
 export interface ExtinguisherListResponse {
   data: Extinguisher[];

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { maintenanceApi } from '../../api/maintenance';
-import { Maintenance, mockMaintenance } from '../../mock/mockData';
+import type { Maintenance } from '../../mock/mockData';
+import { mockMaintenance } from '../../mock/mockData';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';

@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { reportsApi } from '../../api/reports';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Flame, ShieldAlert, ClipboardCheck, Wrench, ShieldCheck, FileSpreadsheet } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, FileSpreadsheet } from 'lucide-react';
 import { toast } from 'sonner';
 import StatusBadge from '../../components/StatusBadge';
 import PaginationControls from '../../components/PaginationControls';

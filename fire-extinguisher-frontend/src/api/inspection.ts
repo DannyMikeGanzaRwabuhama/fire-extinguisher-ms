@@ -1,5 +1,5 @@
 import api from './axios';
-import { Inspection } from '../mock/mockData';
+import type { Inspection } from '../mock/mockData';
 
 export interface InspectionListResponse {
   data: Inspection[];

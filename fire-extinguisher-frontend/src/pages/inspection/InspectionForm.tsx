@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { inspectionApi } from '../../api/inspection';
 import { extinguisherApi } from '../../api/extinguisher';
-import { Extinguisher } from '../../mock/mockData';
+import type { Extinguisher } from '../../mock/mockData';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

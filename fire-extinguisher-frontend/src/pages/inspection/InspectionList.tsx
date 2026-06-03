@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { inspectionApi } from '../../api/inspection';
-import { Inspection, mockInspections } from '../../mock/mockData';
+import type { Inspection } from '../../mock/mockData';
+import { mockInspections } from '../../mock/mockData';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

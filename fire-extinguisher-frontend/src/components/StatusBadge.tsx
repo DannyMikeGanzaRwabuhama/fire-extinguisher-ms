@@ -1,4 +1,3 @@
-import React from 'react';
 import { Badge } from '@/components/ui/badge';
 
 const statusColors = {
@@ -11,11 +10,11 @@ const statusColors = {
 };
 
 interface StatusBadgeProps {
-  status: keyof typeof statusColors;
+  status: string;
 }
 
 export default function StatusBadge({ status }: StatusBadgeProps) {
-  const colorClass = statusColors[status] || 'bg-muted text-muted-foreground border-transparent';
+  const colorClass = statusColors[status as keyof typeof statusColors] || 'bg-muted text-muted-foreground border-transparent';
   return (
     <Badge className={`rounded-full px-2.5 py-0.5 text-xs font-semibold tracking-wide ${colorClass}`}>
       {status}

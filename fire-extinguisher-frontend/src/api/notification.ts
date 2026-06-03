@@ -1,5 +1,5 @@
 import api from './axios';
-import { Notification } from '../mock/mockData';
+import type { Notification } from '../mock/mockData';
 
 export interface NotificationListResponse {
   data: Notification[];

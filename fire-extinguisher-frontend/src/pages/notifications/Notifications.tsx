@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { notificationApi } from '../../api/notification';
-import { Notification, mockNotifications } from '../../mock/mockData';
+import type { Notification } from '../../mock/mockData';
+import { mockNotifications } from '../../mock/mockData';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Check, Bell, BellOff, Calendar } from 'lucide-react';

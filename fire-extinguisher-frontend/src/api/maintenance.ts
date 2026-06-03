@@ -1,5 +1,5 @@
 import api from './axios';
-import { Maintenance } from '../mock/mockData';
+import type { Maintenance } from '../mock/mockData';
 
 export interface MaintenanceListResponse {
   data: Maintenance[];

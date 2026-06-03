@@ -1,5 +1,5 @@
 import api from './axios';
-import { User } from '../context/AuthContext';
+import type { User } from '../context/AuthContext';
 
 export interface AuthResponse {
   token: string;
