@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Users, User, Mail, Phone } from 'lucide-react';
 import { toast } from 'sonner';
 import PaginationControls from '../../components/PaginationControls';
+import { Button } from '@/components/ui/button';
+import ConfirmDialog from '../../components/ConfirmDialog';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -28,6 +30,31 @@ export default function UsersList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserInfo | null>(null);
+  const [isPromoting, setIsPromoting] = useState(false);
+
+  const handlePromoteClick = (user: UserInfo) => {
+    setSelectedUser(user);
+    setIsConfirmOpen(true);
+  };
+
+  const handlePromoteConfirm = async () => {
+    if (!selectedUser) return;
+    setIsPromoting(true);
+    try {
+      await userApi.promote(selectedUser.id);
+      toast.success('Role updated successfully');
+      fetchUsers();
+    } catch {
+      toast.error('Failed to update user role.');
+    } finally {
+      setIsPromoting(false);
+      setIsConfirmOpen(false);
+      setSelectedUser(null);
+    }
+  };
 
   const fetchUsers = async () => {
     setIsLoading(true);
@@ -80,12 +107,13 @@ export default function UsersList() {
                   <TableHead className="font-semibold text-foreground">Email</TableHead>
                   <TableHead className="font-semibold text-foreground">Phone</TableHead>
                   <TableHead className="font-semibold text-foreground">Role</TableHead>
+                  <TableHead className="font-semibold text-foreground text-right w-[150px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {users.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
+                    <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
                       No users found.
                     </TableCell>
                   </TableRow>
@@ -122,6 +150,18 @@ export default function UsersList() {
                           {roleNames[item.role] || item.role}
                         </Badge>
                       </TableCell>
+                      <TableCell className="text-right">
+                        {item.role !== 'ROLE_ADMIN' && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePromoteClick(item)}
+                            className="border-primary/20 hover:bg-primary/5 text-xs h-8"
+                          >
+                            {item.role === 'ROLE_USER' ? 'Make Inspector' : 'Make User'}
+                          </Button>
+                         )}
+                      </TableCell>
                     </TableRow>
                   ))
                 )}
@@ -129,12 +169,25 @@ export default function UsersList() {
             </Table>
           </div>
           <PaginationControls
-            page={currentPage}
-            totalPages={totalPages}
-            onPageChange={(page) => setCurrentPage(page)}
+             page={currentPage}
+             totalPages={totalPages}
+             onPageChange={(page) => setCurrentPage(page)}
           />
         </Card>
       )}
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={handlePromoteConfirm}
+        title={selectedUser?.role === 'ROLE_USER' ? 'Promote User' : 'Demote Inspector'}
+        description={
+          selectedUser?.role === 'ROLE_USER'
+            ? `Are you sure you want to promote ${selectedUser?.firstName} ${selectedUser?.lastName} to Inspector?`
+            : `Are you sure you want to demote ${selectedUser?.firstName} ${selectedUser?.lastName} to Regular User?`
+        }
+        confirmText="Confirm"
+        isLoading={isPromoting}
+      />
     </div>
   );
 }

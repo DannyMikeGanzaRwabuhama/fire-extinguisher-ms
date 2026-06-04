@@ -5,8 +5,8 @@ const { generateOTP } = require('../../utils/otp');
 const { sendOTPEmail } = require('../../config/email');
 
 const register = async (req, res, next) => {
-  const { firstName, lastName, email, password, role, phone } = req.body;
-  const userRole = role || 'ROLE_USER';
+  const { firstName, lastName, email, password, phone } = req.body;
+  const userRole = 'ROLE_USER';
 
   try {
     // Check if email already exists

@@ -22,4 +22,9 @@ export const userApi = {
     const res = await api.get('/users', { params });
     return res.data;
   },
+
+  promote: async (id: number): Promise<UserInfo> => {
+    const res = await api.put(`/users/${id}/promote`);
+    return res.data;
+  },
 };

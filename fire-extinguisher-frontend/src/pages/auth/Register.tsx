@@ -5,7 +5,7 @@ import { authApi } from '../../api/auth';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 import { toast } from 'sonner';
 import { Eye, EyeOff, Lock, Mail, User as UserIcon } from 'lucide-react';
 
@@ -17,7 +17,7 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState<'ROLE_USER' | 'ROLE_INSPECTOR'>('ROLE_USER');
+
   const [phone, setPhone] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +47,6 @@ export default function Register() {
         lastName,
         email,
         password,
-        role,
         phone: phone || undefined,
       });
       localStorage.setItem('pending_verification', email);
@@ -146,24 +145,7 @@ export default function Register() {
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Role *
-            </label>
-            <Select
-              value={role}
-              onValueChange={(val: 'ROLE_USER' | 'ROLE_INSPECTOR') => setRole(val)}
-              disabled={isLoading}
-            >
-              <SelectTrigger className="bg-background border-border text-foreground rounded-md">
-                <SelectValue placeholder="Select role" />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border text-foreground">
-                <SelectItem value="ROLE_USER">User</SelectItem>
-                <SelectItem value="ROLE_INSPECTOR">Inspector</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+
 
           <div className="space-y-2">
             <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider" htmlFor="password">

@@ -14,4 +14,10 @@ router.get('/', [
   validate
 ], userController.getAllUsers);
 
+router.put('/:id/promote', [
+  authenticateToken,
+  authorizeRoles('ROLE_ADMIN'),
+  validate
+], userController.promoteUser);
+
 module.exports = router;

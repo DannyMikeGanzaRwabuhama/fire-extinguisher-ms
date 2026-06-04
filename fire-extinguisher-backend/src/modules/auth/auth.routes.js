@@ -113,7 +113,6 @@ router.post('/register', [
   body('lastName').trim().notEmpty().withMessage('Last name is required'),
   body('email').isEmail().withMessage('A valid email is required').normalizeEmail(),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
-  body('role').optional().isIn(['ROLE_USER', 'ROLE_INSPECTOR', 'ROLE_ADMIN']).withMessage('Invalid role specified'),
   body('phone').optional().trim(),
   validate
 ], authController.register);

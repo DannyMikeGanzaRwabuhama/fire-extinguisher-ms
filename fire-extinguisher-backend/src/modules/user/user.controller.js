@@ -40,6 +40,46 @@ const getAllUsers = async (req, res, next) => {
   }
 };
 
+const promoteUser = async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    const userResult = await db.query('SELECT * FROM users WHERE id = $1', [id]);
+    const user = userResult.rows[0];
+
+    if (!user) {
+      return res.status(404).json({
+        status: 404,
+        message: 'User not found.',
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    if (user.role === 'ROLE_ADMIN') {
+      return res.status(403).json({
+        status: 403,
+        message: 'Cannot change admin role',
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    const newRole = user.role === 'ROLE_USER' ? 'ROLE_INSPECTOR' : 'ROLE_USER';
+
+    const updateResult = await db.query(
+      `UPDATE users 
+       SET role = $1 
+       WHERE id = $2 
+       RETURNING id, first_name, last_name, email, role, phone`,
+      [newRole, id]
+    );
+
+    res.status(200).json(mapUser(updateResult.rows[0]));
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getAllUsers,
+  promoteUser,
 };
