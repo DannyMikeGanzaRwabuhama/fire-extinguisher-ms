@@ -10,7 +10,6 @@ import { toast } from 'sonner';
 import { Eye, EyeOff, Lock, Mail, User as UserIcon } from 'lucide-react';
 
 export default function Register() {
-  const { login } = useAuth();
   const navigate = useNavigate();
 
   const [firstName, setFirstName] = useState('');
@@ -51,9 +50,9 @@ export default function Register() {
         role,
         phone: phone || undefined,
       });
-      login(data.token, data.user);
-      toast.success(`Account created! Welcome, ${data.user.firstName}!`);
-      navigate('/dashboard');
+      localStorage.setItem('pending_verification', email);
+      toast.success(data.message || 'OTP sent to your email. Please verify.');
+      navigate('/verify-email');
     } catch (err: any) {
       const errorMsg = err.response?.data?.message || 'Registration failed. Please try again.';
       toast.error(errorMsg);

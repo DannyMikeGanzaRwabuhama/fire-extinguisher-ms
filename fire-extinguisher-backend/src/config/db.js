@@ -29,7 +29,19 @@ const initDb = async () => {
       email VARCHAR(150) UNIQUE NOT NULL,
       password VARCHAR(255) NOT NULL,
       role VARCHAR(50) NOT NULL,
-      phone VARCHAR(50)
+      phone VARCHAR(50),
+      is_verified BOOLEAN DEFAULT false
+    );
+
+    CREATE TABLE IF NOT EXISTS otp_tokens (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      email VARCHAR(255) NOT NULL,
+      otp VARCHAR(6) NOT NULL,
+      type VARCHAR(50) NOT NULL,
+      expires_at TIMESTAMP NOT NULL,
+      used BOOLEAN DEFAULT false,
+      created_at TIMESTAMP DEFAULT NOW()
     );
 
     CREATE TABLE IF NOT EXISTS extinguishers (
@@ -73,6 +85,8 @@ const initDb = async () => {
   `;
   
   await pool.query(createTablesSql);
+  // Run migration query to ensure the column is_verified is present on existing tables
+  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT false;');
   console.log('Database tables created/checked successfully.');
   
   // Now run the trigger file

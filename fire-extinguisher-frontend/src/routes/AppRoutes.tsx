@@ -5,6 +5,8 @@ import PublicLayout from '../layouts/PublicLayout';
 import DashboardLayout from '../layouts/DashboardLayout';
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
+import VerifyEmail from '../pages/auth/VerifyEmail';
+import ForgotPassword from '../pages/auth/ForgotPassword';
 import Dashboard from '../pages/dashboard/Dashboard';
 import ExtinguisherList from '../pages/extinguisher/ExtinguisherList';
 import InspectionList from '../pages/inspection/InspectionList';
@@ -41,6 +43,8 @@ export default function AppRoutes() {
       <Route element={<PublicLayout />}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Route>
 
       {/* Protected Routes */}

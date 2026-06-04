@@ -47,7 +47,8 @@ app.use(express.json());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.use(morgan('dev'));
 
-// Routes
+// Routes (Public permitAll and Protected routes)
+// Note: /api/auth exposes public endpoints (register, login, verify-email, forgot-password, reset-password)
 app.use('/api/auth', authRoutes);
 app.use('/api/extinguishers', extinguisherRoutes);
 app.use('/api/inspections', inspectionRoutes);
