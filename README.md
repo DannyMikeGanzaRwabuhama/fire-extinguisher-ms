@@ -54,21 +54,32 @@ RESTFUL_NE/
 ## ✨ Features & Functionality
 
 1. **Role-Based Access Control (RBAC)**:
-   * **Admin (`ROLE_ADMIN`)**: Complete dashboard visibility, database user management, full inventory CRUD (Create, Read, Update, Delete), inspections schedule, maintenance history log, and access to all reporting tools.
+   * **Admin (`ROLE_ADMIN`)**: Complete dashboard visibility, database user management (including role promotion/demotion), full inventory CRUD (Create, Read, Update, Delete), inspections schedule, maintenance history log, and access to all reporting tools.
    * **Inspector (`ROLE_INSPECTOR`)**: Scoped access to schedule inspections, view and complete assigned inspections, log maintenance operations, and view inventory.
    * **User (`ROLE_USER`)**: Scoped to view inventory and schedule inspections. Hides admin reports and user lists.
-2. **Database Trigger Notifications**:
+2. **Email Verification & OTP Signup**:
+   * Registers users with `is_verified = false` (self-selection of roles removed; all public signups default to `ROLE_USER`).
+   * Automatically sends a secure 6-digit OTP code to the user's email using `nodemailer`.
+   * Restricts login attempts with unverified accounts (returns `403 Forbidden` with a reminder toast).
+   * Provides a dedicated `/verify-email` tab to verify credentials and complete login.
+3. **Self-Service Password Reset (OTP)**:
+   * Enables users to request a password reset OTP on `/forgot-password`.
+   * Verifies the OTP, hashes the new password with `bcryptjs`, and updates the database record.
+4. **Admin Role Promotion**:
+   * Enables administrators to promote standard users (`ROLE_USER`) to Inspector (`ROLE_INSPECTOR`) or demote them back directly from the Users grid.
+   * Includes double-confirm guards via the `ConfirmDialog` component before updating.
+5. **Database Trigger Notifications**:
    * Uses a raw SQL trigger (`inspection_scheduled_trigger` on `inspections`) to automatically generate unread inbox notifications for both the user scheduling the inspection and the assigned inspector upon status updates.
-3. **Smart Inventory Limits & Auto-Expiration**:
+6. **Smart Inventory Limits & Auto-Expiration**:
    * Auto-calculates active expired statuses client-side based on reference timestamps.
    * Restricts scheduling or updating actions on `EXPIRED` or `DECOMMISSIONED` extinguisher assets.
-4. **Validation Guardrails**:
+7. **Validation Guardrails**:
    * Double-schedule inspection checks prevent scheduling conflicts (`409 Conflict` on same extinguisher, date, and time slot).
    * Restricts maintenance logging to only `COMPLETED` inspection references.
    * Full date validation (e.g. installation date must precede expiry date).
-5. **System Reports & Downloads**:
+8. **System Reports & Downloads**:
    * Features Stock, Expired, Inspections, Maintenance, and Compliance tabs.
-   * Native exports of structured data tables to **CSV** and fully formatted **PDF** files directly from the stream.
+   * Exports data tables to **CSV** and fully formatted **PDF** documents (featuring Crimson branding, zebra striping, page numbers, and dynamic line-wrapping to prevent overlaps).
 
 ---
 

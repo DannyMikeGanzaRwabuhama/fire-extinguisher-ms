@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%" fx="30%" fy="30%">
+      <stop offset="0%" stop-color="#ef4444" />
+      <stop offset="100%" stop-color="#991b1b" />
+    </radialGradient>
+  </defs>
+  <circle cx="50%" cy="50%" r="48" fill="url(#bgGrad)" />
+  
+  <rect x="42" y="38" width="16" height="38" rx="4" fill="#ffffff" />
+  <rect x="44" y="74" width="12" height="3" fill="#ffffff" opacity="0.8" />
+  <ellipse cx="50" cy="38" rx="6" ry="2" fill="#e2e8f0" />
+  <rect x="48" y="32" width="4" height="6" fill="#e2e8f0" />
+  <path d="M47 30 L40 26 L42 24 L48 29 Z" fill="#e2e8f0" />
+  <path d="M51 32 C54 32, 58 35, 58 40 L58 50 C58 53, 56 55, 54 55 L53 55 L53 53 L54 53 C55 53, 56 51, 56 50 L56 40 C56 37, 53 34, 50 34" fill="#e2e8f0" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round" fill-opacity="0" />
+  <circle cx="50" cy="45" r="4" fill="#059669" />
+  <circle cx="50" cy="45" r="3" fill="#ffffff" />
+  <line x1="50" y1="45" x2="51.5" y2="42.5" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" />
+  <rect x="45" y="52" width="10" height="12" fill="#ef4444" rx="1" />
+  <rect x="47" y="55" width="6" height="2" fill="#ffffff" />
+  <rect x="47" y="59" width="6" height="1.5" fill="#ffffff" />
+</svg>
